@@ -4,13 +4,13 @@
 
 //! Generic types for CSS values in SVG
 
-use cssparser::Parser;
 use crate::parser::{Parse, ParserContext};
-use style_traits::{ParseError, StyleParseErrorKind};
 use crate::values::{Either, None_};
 use crate::values::computed::NumberOrPercentage;
 use crate::values::computed::length::LengthOrPercentage;
 use crate::values::distance::{ComputeSquaredDistance, SquaredDistance};
+use cssparser::Parser;
+use style_traits::{ParseError, StyleParseErrorKind};
 
 /// An SVG paint value
 ///
