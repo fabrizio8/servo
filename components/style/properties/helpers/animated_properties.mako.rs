@@ -9,50 +9,50 @@
     from itertools import groupby
 %>
 
-#[cfg(feature = "gecko")] use gecko_bindings::structs::RawServoAnimationValueMap;
-#[cfg(feature = "gecko")] use gecko_bindings::structs::RawGeckoGfxMatrix4x4;
-#[cfg(feature = "gecko")] use gecko_bindings::structs::nsCSSPropertyID;
-#[cfg(feature = "gecko")] use gecko_bindings::sugar::ownership::{HasFFI, HasSimpleFFI};
+#[cfg(feature = "gecko")] use crate::gecko_bindings::structs::RawServoAnimationValueMap;
+#[cfg(feature = "gecko")] use crate::gecko_bindings::structs::RawGeckoGfxMatrix4x4;
+#[cfg(feature = "gecko")] use crate::gecko_bindings::structs::nsCSSPropertyID;
+#[cfg(feature = "gecko")] use crate::gecko_bindings::sugar::ownership::{HasFFI, HasSimpleFFI};
 use itertools::{EitherOrBoth, Itertools};
 use num_traits::Zero;
-use properties::{CSSWideKeyword, PropertyDeclaration};
-use properties::longhands;
-use properties::longhands::font_weight::computed_value::T as FontWeight;
-use properties::longhands::visibility::computed_value::T as Visibility;
-use properties::PropertyId;
-use properties::{LonghandId, ShorthandId};
+use crate::properties::{CSSWideKeyword, PropertyDeclaration};
+use crate::properties::longhands;
+use crate::properties::longhands::font_weight::computed_value::T as FontWeight;
+use crate::properties::longhands::visibility::computed_value::T as Visibility;
+use crate::properties::PropertyId;
+use crate::properties::{LonghandId, ShorthandId};
 use servo_arc::Arc;
 use smallvec::SmallVec;
 use std::{cmp, ptr};
 use std::mem::{self, ManuallyDrop};
-use hash::FxHashMap;
+use crate::hash::FxHashMap;
 use super::ComputedValues;
-use values::CSSFloat;
-use values::animated::{Animate, Procedure, ToAnimatedValue, ToAnimatedZero};
-use values::animated::color::Color as AnimatedColor;
-use values::animated::effects::Filter as AnimatedFilter;
-#[cfg(feature = "gecko")] use values::computed::TransitionProperty;
-use values::computed::{Angle, CalcLengthOrPercentage};
-use values::computed::{ClipRect, Context};
-use values::computed::{Length, LengthOrPercentage, LengthOrPercentageOrAuto};
-use values::computed::LengthOrPercentageOrNone;
-use values::computed::{NonNegativeNumber, Number, NumberOrPercentage, Percentage};
-use values::computed::length::NonNegativeLengthOrPercentage;
-use values::computed::ToComputedValue;
-use values::computed::transform::{DirectionVector, Matrix, Matrix3D};
-use values::computed::transform::TransformOperation as ComputedTransformOperation;
-use values::computed::transform::Transform as ComputedTransform;
-use values::computed::transform::Rotate as ComputedRotate;
-use values::computed::transform::Translate as ComputedTranslate;
-use values::computed::transform::Scale as ComputedScale;
-use values::computed::url::ComputedUrl;
-use values::generics::transform::{self, Rotate, Translate, Scale, Transform, TransformOperation};
-use values::distance::{ComputeSquaredDistance, SquaredDistance};
-use values::generics::font::{FontSettings as GenericFontSettings, FontTag, VariationValue};
-use values::computed::font::FontVariationSettings;
-use values::generics::effects::Filter;
-use values::generics::svg::{SVGLength,  SvgLengthOrPercentageOrNumber, SVGPaint};
-use values::generics::svg::{SVGPaintKind, SVGStrokeDashArray, SVGOpacity};
+use crate::values::CSSFloat;
+use crate::values::animated::{Animate, Procedure, ToAnimatedValue, ToAnimatedZero};
+use crate::values::animated::color::Color as AnimatedColor;
+use crate::values::animated::effects::Filter as AnimatedFilter;
+#[cfg(feature = "gecko")] use crate::values::computed::TransitionProperty;
+use crate::values::computed::{Angle, CalcLengthOrPercentage};
+use crate::values::computed::{ClipRect, Context};
+use crate::values::computed::{Length, LengthOrPercentage, LengthOrPercentageOrAuto};
+use crate::values::computed::LengthOrPercentageOrNone;
+use crate::values::computed::{NonNegativeNumber, Number, NumberOrPercentage, Percentage};
+use crate::values::computed::length::NonNegativeLengthOrPercentage;
+use crate::values::computed::ToComputedValue;
+use crate::values::computed::transform::{DirectionVector, Matrix, Matrix3D};
+use crate::values::computed::transform::TransformOperation as ComputedTransformOperation;
+use crate::values::computed::transform::Transform as ComputedTransform;
+use crate::values::computed::transform::Rotate as ComputedRotate;
+use crate::values::computed::transform::Translate as ComputedTranslate;
+use crate::values::computed::transform::Scale as ComputedScale;
+use crate::values::computed::url::ComputedUrl;
+use crate::values::generics::transform::{self, Rotate, Translate, Scale, Transform, TransformOperation};
+use crate::values::distance::{ComputeSquaredDistance, SquaredDistance};
+use crate::values::generics::font::{FontSettings as GenericFontSettings, FontTag, VariationValue};
+use crate::values::computed::font::FontVariationSettings;
+use crate::values::generics::effects::Filter;
+use crate::values::generics::svg::{SVGLength,  SvgLengthOrPercentageOrNumber, SVGPaint};
+use crate::values::generics::svg::{SVGPaintKind, SVGStrokeDashArray, SVGOpacity};
 use void::{self, Void};
 
 
@@ -393,7 +393,7 @@ impl AnimationValue {
     /// "Uncompute" this animation value in order to be used inside the CSS
     /// cascade.
     pub fn uncompute(&self) -> PropertyDeclaration {
-        use properties::longhands;
+        use crate::properties::longhands;
         use self::AnimationValue::*;
 
         use super::PropertyDeclarationVariantRepr;
@@ -437,7 +437,7 @@ impl AnimationValue {
     pub fn from_declaration(
         decl: &PropertyDeclaration,
         context: &mut Context,
-        extra_custom_properties: Option<<&Arc<::custom_properties::CustomPropertiesMap>>,
+        extra_custom_properties: Option<<&Arc<crate::custom_properties::CustomPropertiesMap>>,
         initial: &ComputedValues
     ) -> Option<Self> {
         use super::PropertyDeclarationVariantRepr;
@@ -1041,7 +1041,7 @@ impl<'a> Iterator for FontSettingTagIter<'a> {
 impl Animate for ClipRect {
     #[inline]
     fn animate(&self, other: &Self, procedure: Procedure) -> Result<Self, ()> {
-        use values::computed::Length;
+        use crate::values::computed::Length;
         let animate_component = |this: &Option<Length>, other: &Option<Length>| {
             match (this.animate(other, procedure)?, procedure) {
                 (None, Procedure::Interpolate { .. }) => Ok(None),
@@ -1296,8 +1296,8 @@ impl Animate for ComputedTransformOperation {
                 &TransformOperation::Perspective(ref fd),
                 &TransformOperation::Perspective(ref td),
             ) => {
-                use values::computed::CSSPixelLength;
-                use values::generics::transform::create_perspective_matrix;
+                use crate::values::computed::CSSPixelLength;
+                use crate::values::generics::transform::create_perspective_matrix;
 
                 // From https://drafts.csswg.org/css-transforms-2/#interpolation-of-transform-functions:
                 //
@@ -1472,7 +1472,7 @@ impl ComputeSquaredDistance for MatrixDecomposed2D {
     #[inline]
     fn compute_squared_distance(&self, other: &Self) -> Result<SquaredDistance, ()> {
         // Use Radian to compute the distance.
-        const RAD_PER_DEG: f64 = ::std::f64::consts::PI / 180.0;
+        const RAD_PER_DEG: f64 = std::f64::consts::PI / 180.0;
         let angle1 = self.angle as f64 * RAD_PER_DEG;
         let angle2 = other.angle as f64 * RAD_PER_DEG;
         Ok(self.translate.compute_squared_distance(&other.translate)? +

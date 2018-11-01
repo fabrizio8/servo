@@ -39,7 +39,7 @@ ${helpers.single_keyword(
 ${helpers.predefined_type(
     "fill",
     "SVGPaint",
-    "::values::computed::SVGPaint::black()",
+    "crate::values::computed::SVGPaint::black()",
     products="gecko",
     animation_value_type="IntermediateSVGPaint",
     boxed=True,
@@ -84,9 +84,9 @@ ${helpers.predefined_type(
 
 ${helpers.predefined_type(
     "stroke-width", "SVGWidth",
-    "::values::computed::NonNegativeLength::new(1.).into()",
+    "crate::values::computed::NonNegativeLength::new(1.).into()",
     products="gecko",
-    animation_value_type="::values::computed::SVGWidth",
+    animation_value_type="crate::values::computed::SVGWidth",
     spec="https://www.w3.org/TR/SVG2/painting.html#StrokeWidth",
 )}
 
@@ -111,7 +111,7 @@ ${helpers.predefined_type(
     "GreaterThanOrEqualToOneNumber",
     "From::from(4.0)",
     products="gecko",
-    animation_value_type="::values::computed::GreaterThanOrEqualToOneNumber",
+    animation_value_type="crate::values::computed::GreaterThanOrEqualToOneNumber",
     spec="https://www.w3.org/TR/SVG11/painting.html#StrokeMiterlimitProperty",
 )}
 
@@ -129,7 +129,7 @@ ${helpers.predefined_type(
     "SVGStrokeDashArray",
     "Default::default()",
     products="gecko",
-    animation_value_type="::values::computed::SVGStrokeDashArray",
+    animation_value_type="crate::values::computed::SVGStrokeDashArray",
     spec="https://www.w3.org/TR/SVG2/painting.html#StrokeDashing",
 )}
 
