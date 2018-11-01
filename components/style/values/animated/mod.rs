@@ -11,12 +11,12 @@
 use app_units::Au;
 use euclid::{Point2D, Size2D};
 use smallvec::SmallVec;
-use values::computed::Angle as ComputedAngle;
-use values::computed::BorderCornerRadius as ComputedBorderCornerRadius;
-use values::computed::MaxLength as ComputedMaxLength;
-use values::computed::MozLength as ComputedMozLength;
-use values::computed::length::CalcLengthOrPercentage;
-use values::computed::url::ComputedUrl;
+use crate::values::computed::Angle as ComputedAngle;
+use crate::values::computed::BorderCornerRadius as ComputedBorderCornerRadius;
+use crate::values::computed::MaxLength as ComputedMaxLength;
+use crate::values::computed::MozLength as ComputedMozLength;
+use crate::values::computed::length::CalcLengthOrPercentage;
+use crate::values::computed::url::ComputedUrl;
 
 pub mod color;
 pub mod effects;
@@ -291,8 +291,8 @@ impl ToAnimatedValue for ComputedMaxLength {
 
     #[inline]
     fn from_animated_value(animated: Self::AnimatedValue) -> Self {
-        use values::computed::{Length, LengthOrPercentageOrNone, Percentage};
-        use values::generics::length::MaxLength as GenericMaxLength;
+        use crate::values::computed::{Length, LengthOrPercentageOrNone, Percentage};
+        use crate::values::generics::length::MaxLength as GenericMaxLength;
         match animated {
             GenericMaxLength::LengthOrPercentageOrNone(lopn) => {
                 let result = match lopn {
@@ -321,8 +321,8 @@ impl ToAnimatedValue for ComputedMozLength {
 
     #[inline]
     fn from_animated_value(animated: Self::AnimatedValue) -> Self {
-        use values::computed::{Length, LengthOrPercentageOrAuto, Percentage};
-        use values::generics::length::MozLength as GenericMozLength;
+        use crate::values::computed::{Length, LengthOrPercentageOrAuto, Percentage};
+        use crate::values::generics::length::MozLength as GenericMozLength;
         match animated {
             GenericMozLength::LengthOrPercentageOrAuto(lopa) => {
                 let result = match lopa {

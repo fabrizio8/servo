@@ -5,12 +5,12 @@
 //! Generic types for CSS values in SVG
 
 use cssparser::Parser;
-use parser::{Parse, ParserContext};
+use crate::parser::{Parse, ParserContext};
 use style_traits::{ParseError, StyleParseErrorKind};
-use values::{Either, None_};
-use values::computed::NumberOrPercentage;
-use values::computed::length::LengthOrPercentage;
-use values::distance::{ComputeSquaredDistance, SquaredDistance};
+use crate::values::{Either, None_};
+use crate::values::computed::NumberOrPercentage;
+use crate::values::computed::length::LengthOrPercentage;
+use crate::values::distance::{ComputeSquaredDistance, SquaredDistance};
 
 /// An SVG paint value
 ///
@@ -87,10 +87,10 @@ fn parse_fallback<'i, 't, ColorType: Parse>(
     context: &ParserContext,
     input: &mut Parser<'i, 't>,
 ) -> Option<Either<ColorType, None_>> {
-    if input.try(|i| i.expect_ident_matching("none")).is_ok() {
+    if input.r#try(|i| i.expect_ident_matching("none")).is_ok() {
         Some(Either::Second(None_))
     } else {
-        if let Ok(color) = input.try(|i| ColorType::parse(context, i)) {
+        if let Ok(color) = input.r#try(|i| ColorType::parse(context, i)) {
             Some(Either::First(color))
         } else {
             None
@@ -103,12 +103,12 @@ impl<ColorType: Parse, UrlPaintServer: Parse> Parse for SVGPaint<ColorType, UrlP
         context: &ParserContext,
         input: &mut Parser<'i, 't>,
     ) -> Result<Self, ParseError<'i>> {
-        if let Ok(url) = input.try(|i| UrlPaintServer::parse(context, i)) {
+        if let Ok(url) = input.r#try(|i| UrlPaintServer::parse(context, i)) {
             Ok(SVGPaint {
                 kind: SVGPaintKind::PaintServer(url),
                 fallback: parse_fallback(context, input),
             })
-        } else if let Ok(kind) = input.try(SVGPaintKind::parse_ident) {
+        } else if let Ok(kind) = input.r#try(SVGPaintKind::parse_ident) {
             if let SVGPaintKind::None = kind {
                 Ok(SVGPaint {
                     kind: kind,
@@ -120,7 +120,7 @@ impl<ColorType: Parse, UrlPaintServer: Parse> Parse for SVGPaint<ColorType, UrlP
                     fallback: parse_fallback(context, input),
                 })
             }
-        } else if let Ok(color) = input.try(|i| ColorType::parse(context, i)) {
+        } else if let Ok(color) = input.r#try(|i| ColorType::parse(context, i)) {
             Ok(SVGPaint {
                 kind: SVGPaintKind::Color(color),
                 fallback: None,
@@ -209,11 +209,11 @@ impl<LengthOrPercentageType: Parse, NumberType: Parse> Parse
         context: &ParserContext,
         input: &mut Parser<'i, 't>,
     ) -> Result<Self, ParseError<'i>> {
-        if let Ok(num) = input.try(|i| NumberType::parse(context, i)) {
+        if let Ok(num) = input.r#try(|i| NumberType::parse(context, i)) {
             return Ok(SvgLengthOrPercentageOrNumber::Number(num));
         }
 
-        if let Ok(lop) = input.try(|i| LengthOrPercentageType::parse(context, i)) {
+        if let Ok(lop) = input.r#try(|i| LengthOrPercentageType::parse(context, i)) {
             return Ok(SvgLengthOrPercentageOrNumber::LengthOrPercentage(lop));
         }
         Err(input.new_custom_error(StyleParseErrorKind::UnspecifiedError))
