@@ -586,12 +586,13 @@ class MachCommands(CommandBase):
         args = [sys.executable] + args + [url]
         process = subprocess.Popen(args, stdout=subprocess.PIPE)
         try:
+            sys.stdout._set_mode('b')
             while 1:
                 line = process.stdout.readline()
                 if len(line) == 0:
                     print("EOF without finding the expected line")
                     return 1
-                print(line.rstrip())
+                sys.stdout.write(line)
                 if "JavaScript is running!" in line:
                     break
         finally:
