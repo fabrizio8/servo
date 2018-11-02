@@ -49,6 +49,7 @@ use dom::bindings::utils::WindowProxyHandler;
 use dom::document::PendingRestyle;
 use dom::htmlimageelement::SourceSet;
 use dom::htmlmediaelement::MediaFrameRenderer;
+use dom::timeranges::TimeRangesContainer;
 use encoding_rs::{Decoder, Encoding};
 use euclid::{Transform2D, Transform3D, Point2D, Vector2D, Rect, TypedSize2D, TypedScale};
 use euclid::Length as EuclidLength;
@@ -139,6 +140,7 @@ unsafe_no_jsmanaged_fields!(&'static Encoding);
 
 unsafe_no_jsmanaged_fields!(RefCell<Decoder>);
 unsafe_no_jsmanaged_fields!(RefCell<Vec<u8>>);
+unsafe_no_jsmanaged_fields!(RefCell<TimeRangesContainer>);
 
 unsafe_no_jsmanaged_fields!(Reflector);
 
