@@ -31,6 +31,7 @@ use dom::htmlvideoelement::HTMLVideoElement;
 use dom::mediaerror::MediaError;
 use dom::node::{document_from_node, window_from_node, Node, NodeDamage, UnbindContext};
 use dom::promise::Promise;
+use dom::timeranges::{TimeRanges, TimeRangesContainer};
 use dom::virtualmethods::VirtualMethods;
 use dom_struct::dom_struct;
 use fetch::FetchCanceller;
@@ -53,7 +54,7 @@ use servo_media::ServoMedia;
 use servo_media::player::{PlaybackState, Player, PlayerEvent, StreamType};
 use servo_media::player::frame::{Frame, FrameRenderer};
 use servo_url::ServoUrl;
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;
 use std::f64;
 use std::mem;
@@ -180,6 +181,9 @@ pub struct HTMLMediaElement {
     seeking: Cell<bool>,
     /// URL of the media resource, if any.
     resource_url: DomRefCell<Option<ServoUrl>>,
+    /// https://html.spec.whatwg.org/multipage/#dom-media-played
+    #[ignore_malloc_size_of = "Rc"]
+    played: Rc<RefCell<TimeRangesContainer>>,
 }
 
 /// <https://html.spec.whatwg.org/multipage/#dom-media-networkstate>
@@ -231,6 +235,7 @@ impl HTMLMediaElement {
             default_playback_start_position: Cell::new(0.),
             seeking: Cell::new(false),
             resource_url: DomRefCell::new(None),
+            played: Rc::new(RefCell::new(TimeRangesContainer::new())),
         }
     }
 
@@ -1174,7 +1179,13 @@ impl HTMLMediaElement {
                 // XXX Steps 12 and 13 require audio and video tracks support.
             },
             PlayerEvent::PositionChanged(position) => {
-                self.playback_position.set(position as f64);
+                // If we are seeking we have to wait until the SeekDone event to change
+                // the playback position.
+                if !self.seeking.get() {
+                    let position = position as f64;
+                    let _ = self.played.borrow_mut().add(self.playback_position.get(), position);
+                    self.playback_position.set(position);
+                }
             },
             PlayerEvent::StateChanged(ref state) => match *state {
                 PlaybackState::Paused => {
@@ -1195,10 +1206,12 @@ impl HTMLMediaElement {
             PlayerEvent::FrameUpdated => {
                 self.upcast::<Node>().dirty(NodeDamage::OtherNodeDamage);
             },
-            PlayerEvent::SeekData(p) => {
-                self.fetch_request(Some(p));
+            PlayerEvent::SeekData(position) => {
+                self.fetch_request(Some(position));
             },
-            PlayerEvent::SeekDone(_) => {
+            PlayerEvent::SeekDone(position) => {
+                self.playback_position.set(position as f64);
+
                 // Continuation of
                 // https://html.spec.whatwg.org/multipage/#dom-media-seek
 
@@ -1343,6 +1356,11 @@ impl HTMLMediaElementMethods for HTMLMediaElement {
     // https://html.spec.whatwg.org/multipage/#dom-media-fastseek
     fn FastSeek(&self, time: Finite<f64>) {
         self.seek(*time, /* approximat_for_speed */ true);
+    }
+
+    // https://html.spec.whatwg.org/multipage/#dom-media-played
+    fn Played(&self) -> DomRoot<TimeRanges> {
+        TimeRanges::new(self.global().as_window(), self.played.clone())
     }
 }
 
